@@ -5,4 +5,4 @@ npm install
 npm run dev
 ```
 
-Will run the project on [localhost:3000](http://localhost:3000/):
+Will run the project on [localhost:3000](http://localhost:3000/)
