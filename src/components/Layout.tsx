@@ -1,40 +1,32 @@
 import Head from "next/head";
-import Link from "next/link";
-import React, { FC } from "react";
+import Image from "next/image";
+import { FC, ReactNode } from "react";
+
+// const NAVIGATION = [{ name: "Home", href: "/" }];
 
 type Props = {
-    title?: string;
+    title: string;
+    heading?: ReactNode;
 };
 
-const Layout: FC<Props> = ({ children, title }) => (
-    <div>
+export const Layout: FC<Props> = ({ title, children, heading }) => (
+    <>
         <Head>
             <title>{title}</title>
-            <meta charSet="utf-8" />
-            <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            <meta name="description" content="HerHack 2021 - Diversity Challenge" />
+            <meta
+                name="viewport"
+                content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
+            />
         </Head>
-        <header>
-            <nav>
-                <Link href="/">
-                    <a>Home</a>
-                </Link>{" "}
-                |{" "}
-                <Link href="/about">
-                    <a>About</a>
-                </Link>{" "}
-                |{" "}
-                <Link href="/users">
-                    <a>Users List</a>
-                </Link>{" "}
-                | <a href="/api/users">Users API</a>
-            </nav>
+        <header className="flex justify-center bg-gradient-to-br from-indigo-600 to to-indigo-800">
+            <div className="w-full max-w-full md:max-w-xl p-3 flex justify-between items-center text-white text-xl">
+                <a className="hover:opacity-90 transition-opacity" href="/">
+                    <Image src="/logo.png" height={60} width={60} alt="Logo" />
+                </a>
+                {heading}
+            </div>
         </header>
-        {children}
-        <footer>
-            <hr />
-            <span>I'm here to stay (Footer)</span>
-        </footer>
-    </div>
+        <div className="max-w-full md:max-w-xl mx-auto px-4 py-12">{children}</div>
+    </>
 );
-
-export default Layout;

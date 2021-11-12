@@ -1,55 +1,52 @@
-import { GetStaticPaths, GetStaticProps } from "next";
-import Layout from "../../components/Layout";
-import ListDetail from "../../components/ListDetail";
-import { User } from "../../interfaces";
-import { sampleUserData } from "../../utils/sample-data";
+import { GetServerSideProps, NextPage } from "next";
+import Image from "next/image";
+import { FC } from "react";
+import { Heading1 } from "../../components/Heading1";
+import { Layout } from "../../components/Layout";
+import { AdminScreen } from "../../components/screens/AdminScreen";
+import { ProfileScreen } from "../../components/screens/ProfileScreen";
+import { EXAMPLE_USER, EXAMPLE_USERS } from "../../data";
+import { User } from "../../types";
 
 type Props = {
-    item?: User;
-    errors?: string;
+    user: User | null;
+    users: User[];
 };
 
-const UserDetail = ({ item, errors }: Props) => {
-    if (errors) {
+const Profile: FC<{ name: string }> = ({ name }) => (
+    <div className="flex items-center gap-x-2 text-white">
+        <span>{name}</span>
+        <Image src="/user.svg" height={40} width={40} alt="Logo" />
+    </div>
+);
+
+const UserDetail: NextPage<Props> = ({ user, users }) => {
+    if (!user) {
         return (
-            <Layout title="Error | Next.js + TypeScript Example">
-                <p>
-                    <span style={{ color: "red" }}>Error:</span> {errors}
-                </p>
+            <Layout title="404 - User not found">
+                <p className="text-xl text-red-600">User not found</p>
             </Layout>
         );
     }
 
+    const { admin, firstName, lastName } = user;
+    const name = [firstName, lastName].join(" ");
+    const title = ["Hello", admin ? "Admin" : "", name].join(" ");
+
     return (
-        <Layout title={`${item ? item.name : "User Detail"} | Next.js + TypeScript Example`}>
-            {item && <ListDetail item={item} />}
+        <Layout title={`${name}'s Page'`} heading={<Profile name={admin ? "Admin" : name} />}>
+            <Heading1>{title} 👋🏼</Heading1>
+            {admin ? <AdminScreen users={users} /> : <ProfileScreen />}
         </Layout>
     );
 };
 
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+    // const user = await getUserByUsername(params?.id);
+    // const users = await getAllUsers();
+    const user = { ...EXAMPLE_USER, admin: params?.id === "admin" };
+    const users = EXAMPLE_USERS;
+    return { props: { user, users } };
+};
+
 export default UserDetail;
-
-export const getStaticPaths: GetStaticPaths = async () => {
-    // Get the paths we want to pre-render based on users
-    const paths = sampleUserData.map((user) => ({
-        params: { id: user.id.toString() },
-    }));
-
-    // We'll pre-render only these paths at build time.
-    // { fallback: false } means other routes should 404.
-    return { paths, fallback: false };
-};
-
-// This function gets called at build time on server-side.
-// It won't be called on client-side, so you can even do
-// direct database queries.
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-    try {
-        const id = params?.id;
-        const item = sampleUserData.find((data) => data.id === Number(id));
-
-        return { props: { item } };
-    } catch (err) {
-        return { props: { errors: err.message } };
-    }
-};
